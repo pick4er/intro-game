@@ -7,6 +7,7 @@ module.exports = function configWebpack(props) {
 
   return {
     mode: production ? 'production' : 'development',
+    devtool: production ? 'cheap-source-map' : 'source-map',
     entry: {
       index: './src/client/index.js',
     },
