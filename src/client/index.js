@@ -1,23 +1,38 @@
-const socketio = require('socket.io-client');
+import socketio from 'socket.io-client';
 
-const { MSG_TYPES } = require('../constants');
+import render from './render';
+import { downloadAssets } from './assets';
+import { processGameUpdate } from './state';
+import { MSG_TYPES } from '../constants';
+
+const location = process.env.NODE_ENV === 'production' ?
+  `wss://${window.location.host}` :
+  `ws://${window.location.host}`;
 
 const socket = socketio(
-  `wss://${window.location.host}`,
+  location,
   { reconnection: false },
 );
-const connectionPromise = new Promise(resolve => {
-  socket.on(MSG_TYPES.CONNECT, () => {
-    console.log('you are connected to server');
-    resolve();
+
+function connect() {
+  return new Promise(resolve => {
+    socket.on(MSG_TYPES.CONNECT, () => {
+      console.log('you are connected to server');
+      resolve();
+    });
   });
+}
+
+Promise.all([
+  connect(),
+  downloadAssets(),
+]).then(() => {
+  socket.on(MSG_TYPES.UPDATE, onUpdate);
+  socket.on(MSG_TYPES.DEAD, onUpdate);
 });
 
-connectionPromise.then(() => {
-  socket.on(MSG_TYPES.JOIN, newPlayer => {
-    console.log(`new player ${newPlayer} joined`);
-  });
-  socket.on(MSG_TYPES.DEAD, deadPlayer => {
-    console.log(`player ${deadPlayer} is dead`);
-  });
-});
+
+function onUpdate(update) {
+  processGameUpdate(update);
+  render();
+}
