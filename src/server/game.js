@@ -4,7 +4,11 @@ const {
   MAP_SIZE,
   PLAYER_HP,
   PLAYER_SPEED,
+  PLAYER_RADIUS,
+  BULLET_RADIUS,
   BULLET_SPEED,
+  BULLET_DAMAGE,
+  BULLET_HIT_SCORE,
   FIRE_COOLDOWN,
   FIRE_STEP,
   SERVER_UPDATE_INTERVAL,
@@ -56,6 +60,32 @@ function shouldSaveBullet(bullet) {
   return !shouldDestroyBullet(bullet);
 }
 
+function applyCollisions(players, bullets) {
+  const hitBullets = [];
+  bullets.forEach(bullet => {
+    const hitPlayer = players.find(player => (
+      bullet.parentId !== player.id &&
+      getDistanceBetween(player, bullet) <= PLAYER_RADIUS + BULLET_RADIUS
+    ));
+
+    if (hitPlayer) {
+      hitBullets.push(bullet);
+      hitPlayer.hp -= BULLET_DAMAGE;
+    }
+  });
+
+  return hitBullets;
+}
+
+function getDistanceBetween(object1, object2) {
+  const { x: x1, y: y1 } = object1;
+  const { x: x2, y: y2 } = object2;
+
+  const dx = x1 - x2;
+  const dy = y1 - y2;
+  return Math.sqrt((dx ** 2) + (dy ** 2));
+}
+
 class Game {
   constructor() {
     this.sockets = {};
@@ -77,6 +107,7 @@ class Game {
       x,
       y,
       direction,
+      score: 0,
       id: socket.id,
       hp: PLAYER_HP,
     };
@@ -105,6 +136,19 @@ class Game {
       bullet => updateBulletLocation(bullet, dt),
     );
     this.bullets = this.bullets.filter(shouldSaveBullet);
+
+    /* count hit bullets */
+    const hitBullets = applyCollisions(
+      Object.values(this.players), this.bullets,
+    );
+    hitBullets.forEach(bullet => {
+      if (this.players[bullet.parentId]) {
+        this.players[bullet.parentId].score += BULLET_HIT_SCORE;
+      }
+    });
+    this.bullets = this.bullets.filter(
+      bullet => !hitBullets.includes(bullet),
+    );
 
     Object.keys(this.players).forEach(playerId => {
       const player = this.players[playerId];

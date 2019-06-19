@@ -2,6 +2,7 @@ import { getAsset } from './assets';
 import { getCurrentState } from './state';
 import {
   MAP_SIZE,
+  PLAYER_HP,
   PLAYER_RADIUS,
   BULLET_RADIUS,
   CLIENT_UPDATE_INTERVAL,
@@ -54,7 +55,7 @@ function renderBackground({ x = 0, y = 0 }) {
 }
 
 function renderPlayer(me, otherPlayer) {
-  const { x, y, direction } = otherPlayer;
+  const { x, y, hp, direction } = otherPlayer;
   const canvasX = canvas.width / 2 + x - me.x;
   const canvasY = canvas.height / 2 + y - me.y;
 
@@ -76,6 +77,13 @@ function renderPlayer(me, otherPlayer) {
     canvasX - PLAYER_RADIUS,
     canvasY + PLAYER_RADIUS + 8,
     PLAYER_RADIUS * 2,
+    2,
+  );
+  context.fillStyle = 'red';
+  context.fillRect(
+    canvasX - PLAYER_RADIUS + PLAYER_RADIUS * 2 * hp / PLAYER_HP,
+    canvasY + PLAYER_RADIUS + 8,
+    PLAYER_RADIUS * 2 * (1 - hp / PLAYER_HP),
     2,
   );
 }
