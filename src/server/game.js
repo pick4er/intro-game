@@ -45,6 +45,16 @@ function emitNewBullet(player) {
   };
 }
 
+function shouldDestroyBullet({ x, y }) {
+  return (
+    x < 0 || x > MAP_SIZE || y < 0 || y > MAP_SIZE
+  );
+}
+
+function shouldSaveBullet(bullet) {
+  return !shouldDestroyBullet(bullet);
+}
+
 class Game {
   constructor() {
     this.sockets = {};
@@ -89,7 +99,10 @@ class Game {
     const dt = now - this.lastUpdateTime;
     this.lastUpdateTime = now;
 
-    this.bullets.forEach(bullet => updateBulletLocation(bullet, dt));
+    this.bullets.forEach(
+      bullet => updateBulletLocation(bullet, dt),
+    );
+    this.bullets = this.bullets.filter(shouldSaveBullet);
 
     Object.keys(this.players).forEach(playerId => {
       const player = this.players[playerId];
