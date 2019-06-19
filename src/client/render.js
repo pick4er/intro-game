@@ -9,10 +9,12 @@ let renderInterval = null;
 setCanvasDimensions();
 
 export default function render() {
-  renderBackground();
-  const { players = [] } = getCurrentState();
-  if (players.length === 0) return;
-  players.forEach(renderPlayer);
+  const { others = [], me = {} } = getCurrentState();
+  if (Object.keys(me).length === 0) return;
+
+  renderBackground(me);
+  renderPlayer(me, me);
+  others.forEach(renderPlayer.bind(null, me));
 }
 
 function setCanvasDimensions() {
@@ -20,9 +22,9 @@ function setCanvasDimensions() {
   canvas.height = window.innerHeight;
 }
 
-function renderBackground() {
-  const backgroundX = canvas.width / 2;
-  const backgroundY = canvas.height / 2;
+function renderBackground({ x = 0, y = 0 }) {
+  const backgroundX = MAP_SIZE / 2 - x + canvas.width / 2;
+  const backgroundY = MAP_SIZE / 2 - y + canvas.height / 2;
   const backgroundGradient = context.createRadialGradient(
     backgroundX,
     backgroundY,
@@ -37,9 +39,10 @@ function renderBackground() {
   context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function renderPlayer({ x, y, direction }) {
-  const canvasX = x;
-  const canvasY = y;
+function renderPlayer(me, otherPlayer) {
+  const { x, y, direction } = otherPlayer;
+  const canvasX = canvas.width / 2 + x - me.x;
+  const canvasY = canvas.height / 2 + y - me.y;
 
   context.save();
   context.translate(canvasX, canvasY);

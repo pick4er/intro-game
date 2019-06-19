@@ -4,7 +4,9 @@ function onMouseInput(e) {
   handleInput(e.clientX, e.clientY);
 }
 
-function handleInput(dirX, dirY) {
+function handleInput(x, y) {
+  const dirX = x - window.innerWidth / 2;
+  const dirY = window.innerHeight / 2 - y;
   updateDirection({ dirX, dirY });
 }
 

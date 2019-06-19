@@ -1,7 +1,6 @@
 const {
   MSG_TYPES,
-  MAP_WIDTH,
-  MAP_HEIGHT,
+  MAP_SIZE,
   PLAYER_SPEED,
   SERVER_UPDATE_INTERVAL,
 } = require('../constants');
@@ -17,8 +16,8 @@ class Game {
   addPlayer(socket) {
     this.sockets[socket.id] = socket;
 
-    const x = MAP_WIDTH * Math.random();
-    const y = MAP_HEIGHT * Math.random();
+    const x = MAP_SIZE * Math.random();
+    const y = MAP_SIZE * Math.random();
     const direction = Math.random() * 2 * Math.PI;
 
     this.players[socket.id] = {
@@ -37,8 +36,7 @@ class Game {
   handleMove(socket, direction) {
     if (this.players[socket.id]) {
       const { dirX, dirY } = direction;
-      const { x, y } = this.players[socket.id];
-      const directionAngle = Math.atan2(dirX - x, y - dirY);
+      const directionAngle = Math.atan2(dirX, dirY);
 
       this.players[socket.id].direction = directionAngle;
     }
@@ -54,7 +52,7 @@ class Game {
       const socket = this.sockets[playerId];
       socket.emit(
         MSG_TYPES.UPDATE,
-        this.getUpdate(),
+        this.getUpdate(playerId),
       );
     });
   }
@@ -66,13 +64,18 @@ class Game {
     const nextX = prevX + distance * Math.sin(direction);
     const nextY = prevY - distance * Math.cos(direction);
 
-    this.players[playerId].x = Math.max(0, Math.min(MAP_WIDTH, nextX));
-    this.players[playerId].y = Math.max(0, Math.min(MAP_HEIGHT, nextY));
+    this.players[playerId].x = Math.max(0, Math.min(MAP_SIZE, nextX));
+    this.players[playerId].y = Math.max(0, Math.min(MAP_SIZE, nextY));
   }
 
-  getUpdate() {
+  getUpdate(playerId) {
+    const others = Object.values(this.players).filter(
+      ({ id }) => id !== playerId,
+    );
+
     return {
-      players: Object.values(this.players),
+      others,
+      me: this.players[playerId],
       timestamp: Date.now(),
     };
   }

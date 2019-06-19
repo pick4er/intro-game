@@ -37,7 +37,8 @@ export function getCurrentState() {
     );
 
     return {
-      players: interpolateObjectArray(baseUpdate.players, nextUpdate.players, ratio),
+      others: interpolateObjectArray(baseUpdate.others, nextUpdate.others, ratio),
+      me: interpolateObject(baseUpdate.me, nextUpdate.me, ratio),
     };
   }
 }
