@@ -104,3 +104,7 @@ export function startRendering() {
   clearInterval(renderInterval);
   renderInterval = setInterval(render, CLIENT_UPDATE_INTERVAL);
 }
+
+export function stopRendering() {
+  clearInterval(renderInterval);
+}

@@ -1,12 +1,18 @@
 import { connect } from './networking';
 import { downloadAssets } from './assets';
-import { startCapturingInput } from './input';
-import { startRendering } from './render';
+import { startCapturingInput, stopCapturingInput } from './input';
+import { startRendering, stopRendering } from './render';
 
 Promise.all([
-  connect(),
+  connect(onGameOver),
   downloadAssets(),
 ]).then(() => {
   startCapturingInput();
   startRendering();
 });
+
+function onGameOver() {
+  stopCapturingInput();
+  stopRendering();
+  console.log('game over');
+}

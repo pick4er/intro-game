@@ -1,5 +1,6 @@
 import socketio from 'socket.io-client';
 import throttle from 'lodash.throttle';
+
 import { MSG_TYPES } from '../constants';
 import { processGameUpdate } from './state';
 import render from './render';
@@ -10,7 +11,7 @@ const location = process.env.NODE_ENV === 'production' ?
 
 const socket = socketio(location, { reconnection: false });
 
-export function connect() {
+export function connect(onGameOver) {
   return new Promise(resolve => {
     socket.on(MSG_TYPES.CONNECT, () => {
       console.log('you are connected to server');
@@ -18,6 +19,7 @@ export function connect() {
     });
   }).then(() => {
     socket.on(MSG_TYPES.UPDATE, onUpdate);
+    socket.on(MSG_TYPES.DEAD, onGameOver);
   });
 }
 

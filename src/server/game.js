@@ -152,10 +152,16 @@ class Game {
 
     Object.keys(this.players).forEach(playerId => {
       const player = this.players[playerId];
+      const socket = this.sockets[playerId];
       updatePlayerLocation(player, dt);
 
       if (this.fireCooldown <= 0) {
         this.bullets.push(emitNewBullet(player, dt));
+      }
+
+      if (player.hp <= 0) {
+        socket.emit(MSG_TYPES.DEAD);
+        this.removePlayer(socket);
       }
     });
 
