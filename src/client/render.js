@@ -13,6 +13,7 @@ export default function render() {
   if (Object.keys(me).length === 0) return;
 
   renderBackground(me);
+  renderBorder(me);
   renderPlayer(me, me);
   others.forEach(renderPlayer.bind(null, me));
 }
@@ -20,6 +21,12 @@ export default function render() {
 function setCanvasDimensions() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+}
+
+function renderBorder({ x, y }) {
+  context.stokeStyle = 'black';
+  context.lineWidth = 1;
+  context.strokeRect(canvas.width / 2 - x, canvas.height / 2 - y, MAP_SIZE, MAP_SIZE);
 }
 
 function renderBackground({ x = 0, y = 0 }) {
