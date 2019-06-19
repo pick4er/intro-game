@@ -1,6 +1,11 @@
 import { getAsset } from './assets';
 import { getCurrentState } from './state';
-import { MAP_SIZE, PLAYER_RADIUS, BULLET_RADIUS, CLIENT_UPDATE_INTERVAL } from '../constants';
+import {
+  MAP_SIZE,
+  PLAYER_RADIUS,
+  BULLET_RADIUS,
+  CLIENT_UPDATE_INTERVAL,
+} from '../constants';
 
 const canvas = document.getElementById('game-canvas');
 const context = canvas.getContext('2d');
@@ -64,6 +69,15 @@ function renderPlayer(me, otherPlayer) {
     PLAYER_RADIUS * 2,
   );
   context.restore();
+
+  /* render hp */
+  context.fillStyle = 'white';
+  context.fillRect(
+    canvasX - PLAYER_RADIUS,
+    canvasY + PLAYER_RADIUS + 8,
+    PLAYER_RADIUS * 2,
+    2,
+  );
 }
 
 function renderBullet(me, bullet) {

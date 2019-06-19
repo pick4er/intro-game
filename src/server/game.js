@@ -2,6 +2,7 @@ const shortid = require('shortid');
 const {
   MSG_TYPES,
   MAP_SIZE,
+  PLAYER_HP,
   PLAYER_SPEED,
   BULLET_SPEED,
   FIRE_COOLDOWN,
@@ -77,6 +78,7 @@ class Game {
       y,
       direction,
       id: socket.id,
+      hp: PLAYER_HP,
     };
   }
 
