@@ -20,7 +20,10 @@ class Game {
     const direction = Math.random() * 2 * Math.PI;
 
     this.players[socket.id] = {
-      x, y, direction,
+      x,
+      y,
+      direction,
+      id: socket.id,
     };
   }
 

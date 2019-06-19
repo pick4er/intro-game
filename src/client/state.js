@@ -10,15 +10,6 @@ export function processGameUpdate(update) {
   }
 }
 
-export function getCurrentState() {
-  const updateIndex = getUpdateIndex();
-  if (updateIndex < 0 || updateIndex === updates.length - 1) {
-    return updates[updates.length - 1] || {};
-  } else {
-    return updates[updateIndex];
-  }
-}
-
 function getLocalTime() {
   return Date.now() - RENDER_DELAY;
 }
@@ -29,4 +20,57 @@ function getUpdateIndex() {
     if (updates[i].timestamp <= localTime) return i;
   }
   return -1;
+}
+
+export function getCurrentState() {
+  const updateIndex = getUpdateIndex();
+  const localTime = getLocalTime();
+
+  if (updateIndex < 0 || updateIndex === updates.length - 1) {
+    return updates[updates.length - 1] || {};
+  } else {
+    const baseUpdate = updates[updateIndex];
+    const nextUpdate = updates[updateIndex + 1];
+    const ratio = (
+      (localTime - baseUpdate.timestamp) /
+      (nextUpdate.timestamp - baseUpdate.timestamp)
+    );
+
+    return {
+      players: interpolateObjectArray(baseUpdate.players, nextUpdate.players, ratio),
+    };
+  }
+}
+
+function interpolateObjectArray(objects1, objects2, ratio) {
+  return objects1.map(o => interpolateObject(o, objects2.find(o2 => o.id === o2.id), ratio));
+}
+
+function interpolateObject(object1, object2, ratio) {
+  if (!object2) {
+    return object1;
+  }
+
+  const interpolated = {};
+  Object.keys(object1).forEach(key => {
+    if (key === 'direction') {
+      interpolated[key] = interpolateDirection(object1[key], object2[key], ratio);
+    } else {
+      interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;
+    }
+  });
+  return interpolated;
+}
+
+function interpolateDirection(d1, d2, ratio) {
+  const absD = Math.abs(d2 - d1);
+  if (absD >= Math.PI) {
+    if (d1 > d2) {
+      return d1 + (d2 + 2 * Math.PI - d1) * ratio;
+    } else {
+      return d1 - (d2 - 2 * Math.PI - d1) * ratio;
+    }
+  } else {
+    return d1 + (d2 - d1) * ratio;
+  }
 }
