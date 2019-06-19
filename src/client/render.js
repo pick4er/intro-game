@@ -1,14 +1,17 @@
 import { getAsset } from './assets';
 import { getCurrentState } from './state';
-import { MAP_SIZE, PLAYER_RADIUS } from '../constants';
+import { MAP_SIZE, PLAYER_RADIUS, CLIENT_UPDATE_INTERVAL } from '../constants';
 
 const canvas = document.getElementById('game-canvas');
 const context = canvas.getContext('2d');
+let renderInterval = null;
+
 setCanvasDimensions();
 
 export default function render() {
   renderBackground();
-  const { players } = getCurrentState();
+  const { players = [] } = getCurrentState();
+  if (players.length === 0) return;
   players.forEach(renderPlayer);
 }
 
@@ -50,3 +53,9 @@ function renderPlayer({ x, y, direction }) {
   );
   context.restore();
 }
+
+export function startRendering() {
+  clearInterval(renderInterval);
+  renderInterval = setInterval(render, CLIENT_UPDATE_INTERVAL);
+}
+

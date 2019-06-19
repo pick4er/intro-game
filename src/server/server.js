@@ -29,6 +29,7 @@ io.on(MSG_TYPES.CONNECT, onPlayerConnection);
 function onPlayerConnection(socket) {
   setTimeout(() => onJoin(socket), 300);
   socket.on(MSG_TYPES.DISCONNECT, onLeave);
+  socket.on(MSG_TYPES.MOVE, onMove);
 }
 
 const game = new Game();
@@ -39,4 +40,8 @@ function onJoin(socket) {
 
 function onLeave() {
   game.removePlayer(this);
+}
+
+function onMove(direction) {
+  game.handleMove(this, direction);
 }

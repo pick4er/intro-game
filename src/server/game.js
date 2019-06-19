@@ -1,9 +1,15 @@
-const { MSG_TYPES, MAP_WIDTH, MAP_HEIGHT } = require('../constants');
+const {
+  MSG_TYPES,
+  MAP_WIDTH,
+  MAP_HEIGHT,
+  SERVER_UPDATE_INTERVAL,
+} = require('../constants');
 
 class Game {
   constructor() {
     this.sockets = {};
     this.players = {};
+    setInterval(this.update.bind(this), SERVER_UPDATE_INTERVAL);
   }
 
   addPlayer(socket) {
@@ -16,28 +22,37 @@ class Game {
     this.players[socket.id] = {
       x, y, direction,
     };
-
-    const update = this.getUpdate();
-    Object.keys(this.sockets).forEach(socketId => {
-      const playerSocket = this.sockets[socketId];
-      playerSocket.emit(MSG_TYPES.UPDATE, update);
-    });
   }
 
   removePlayer(socket) {
     delete this.sockets[socket.id];
     delete this.players[socket.id];
+  }
 
-    const update = this.getUpdate();
-    Object.keys(this.sockets).forEach(socketId => {
-      const playerSocket = this.sockets[socketId];
-      playerSocket.emit(MSG_TYPES.UPDATE, update);
+  handleMove(socket, direction) {
+    if (this.players[socket.id]) {
+      const { dirX, dirY } = direction;
+      const { x, y } = this.players[socket.id];
+      const directionAngle = Math.atan2(dirX - x, y - dirY);
+
+      this.players[socket.id].direction = directionAngle;
+    }
+  }
+
+  update() {
+    Object.keys(this.players).forEach(playerId => {
+      const socket = this.sockets[playerId];
+      socket.emit(
+        MSG_TYPES.UPDATE,
+        this.getUpdate(),
+      );
     });
   }
 
   getUpdate() {
     return {
       players: Object.values(this.players),
+      timestamp: Date.now(),
     };
   }
 }
