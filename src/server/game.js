@@ -1,14 +1,56 @@
+const shortid = require('shortid');
 const {
   MSG_TYPES,
   MAP_SIZE,
   PLAYER_SPEED,
+  BULLET_SPEED,
+  FIRE_COOLDOWN,
+  FIRE_STEP,
   SERVER_UPDATE_INTERVAL,
 } = require('../constants');
+
+
+function updatePlayerLocation(player, dt) {
+  const { x: prevX, y: prevY, direction } = player;
+  const distance = dt * PLAYER_SPEED;
+
+  const nextX = prevX + distance * Math.sin(direction);
+  const nextY = prevY - distance * Math.cos(direction);
+
+  /* eslint-disable no-param-reassign */
+  player.x = Math.max(0, Math.min(MAP_SIZE, nextX));
+  player.y = Math.max(0, Math.min(MAP_SIZE, nextY));
+  /* eslint-enable no-param-reassign */
+}
+
+function updateBulletLocation(bullet, dt) {
+  const { x, y, direction } = bullet;
+  const distance = dt * BULLET_SPEED;
+
+  /* eslint-disable no-param-reassign */
+  bullet.x = x + distance * Math.sin(direction);
+  bullet.y = y - distance * Math.cos(direction);
+  /* eslint-enable no-param-reassign */
+}
+
+
+function emitNewBullet(player) {
+  const { id: parentId, x, y, direction } = player;
+  return {
+    x,
+    y,
+    parentId,
+    direction,
+    id: shortid(),
+  };
+}
 
 class Game {
   constructor() {
     this.sockets = {};
     this.players = {};
+    this.bullets = [];
+    this.fireCooldown = 0;
     this.lastUpdateTime = Date.now();
     setInterval(this.update.bind(this), SERVER_UPDATE_INTERVAL);
   }
@@ -47,25 +89,27 @@ class Game {
     const dt = now - this.lastUpdateTime;
     this.lastUpdateTime = now;
 
+    this.bullets.forEach(bullet => updateBulletLocation(bullet, dt));
+
     Object.keys(this.players).forEach(playerId => {
-      this.updatePlayerLocation(playerId, dt);
+      const player = this.players[playerId];
+      updatePlayerLocation(player, dt);
+
+      if (this.fireCooldown <= 0) {
+        this.bullets.push(emitNewBullet(player, dt));
+      }
+    });
+
+    if (this.fireCooldown <= 0) this.fireCooldown += FIRE_COOLDOWN;
+    else this.fireCooldown -= FIRE_STEP;
+
+    Object.keys(this.players).forEach(playerId => {
       const socket = this.sockets[playerId];
       socket.emit(
         MSG_TYPES.UPDATE,
         this.getUpdate(playerId),
       );
     });
-  }
-
-  updatePlayerLocation(playerId, dt) {
-    const { x: prevX, y: prevY, direction } = this.players[playerId];
-    const distance = dt * PLAYER_SPEED;
-
-    const nextX = prevX + distance * Math.sin(direction);
-    const nextY = prevY - distance * Math.cos(direction);
-
-    this.players[playerId].x = Math.max(0, Math.min(MAP_SIZE, nextX));
-    this.players[playerId].y = Math.max(0, Math.min(MAP_SIZE, nextY));
   }
 
   getUpdate(playerId) {
@@ -77,6 +121,7 @@ class Game {
       others,
       me: this.players[playerId],
       timestamp: Date.now(),
+      bullets: this.bullets,
     };
   }
 }

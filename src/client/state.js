@@ -37,8 +37,9 @@ export function getCurrentState() {
     );
 
     return {
-      others: interpolateObjectArray(baseUpdate.others, nextUpdate.others, ratio),
       me: interpolateObject(baseUpdate.me, nextUpdate.me, ratio),
+      others: interpolateObjectArray(baseUpdate.others, nextUpdate.others, ratio),
+      bullets: interpolateObjectArray(baseUpdate.bullets, nextUpdate.bullets, ratio),
     };
   }
 }

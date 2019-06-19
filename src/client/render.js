@@ -1,6 +1,6 @@
 import { getAsset } from './assets';
 import { getCurrentState } from './state';
-import { MAP_SIZE, PLAYER_RADIUS, CLIENT_UPDATE_INTERVAL } from '../constants';
+import { MAP_SIZE, PLAYER_RADIUS, BULLET_RADIUS, CLIENT_UPDATE_INTERVAL } from '../constants';
 
 const canvas = document.getElementById('game-canvas');
 const context = canvas.getContext('2d');
@@ -9,13 +9,15 @@ let renderInterval = null;
 setCanvasDimensions();
 
 export default function render() {
-  const { others = [], me = {} } = getCurrentState();
+  const { others = [], me = {}, bullets = [] } = getCurrentState();
   if (Object.keys(me).length === 0) return;
 
   renderBackground(me);
   renderBorder(me);
+
   renderPlayer(me, me);
-  others.forEach(renderPlayer.bind(null, me));
+  bullets.forEach(bullet => renderBullet(me, bullet));
+  others.forEach(otherPlayer => renderPlayer(me, otherPlayer));
 }
 
 function setCanvasDimensions() {
@@ -62,6 +64,18 @@ function renderPlayer(me, otherPlayer) {
     PLAYER_RADIUS * 2,
   );
   context.restore();
+}
+
+function renderBullet(me, bullet) {
+  const { x, y } = bullet;
+
+  context.drawImage(
+    getAsset('bullet.svg'),
+    canvas.width / 2 + x - me.x - BULLET_RADIUS,
+    canvas.height / 2 + y - me.y - BULLET_RADIUS,
+    BULLET_RADIUS * 2,
+    BULLET_RADIUS * 2,
+  );
 }
 
 export function startRendering() {
