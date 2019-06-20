@@ -1,5 +1,5 @@
 import { RENDER_DELAY } from '../constants';
-import { updateLeaderboard } from './leaderboard';
+import { updateLeaderboard } from './vue';
 
 const updates = [];
 
