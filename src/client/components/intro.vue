@@ -7,12 +7,15 @@
 
 <script>
   import { startPlaying } from '../index';
+  import { changeUsername } from "../vue";
 
   export default {
     name: 'intro',
     methods: {
       handleJoin() {
-        startPlaying(this.getUsername() || 'anonymous')
+        const username = this.getUsername()
+        changeUsername(username)
+        startPlaying(username || 'anonymous')
       },
       getUsername() {
         return document.getElementById('username-input').value

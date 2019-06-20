@@ -22,4 +22,9 @@ module.exports = Object.freeze({
     DEAD: 'dead',
     MOVE: 'move',
   },
+  GAME_STATES: {
+    PLAYING: 'playing',
+    DEAD: 'dead',
+    CONNECT: 'connect',
+  },
 });

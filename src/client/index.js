@@ -2,7 +2,8 @@ import { connect, joinGame } from './networking';
 import { downloadAssets } from './assets';
 import { startCapturingInput, stopCapturingInput } from './input';
 import { startRendering, stopRendering } from './render';
-import { changeShouldPlay } from './vue';
+import { changeGameState } from './vue';
+import { GAME_STATES } from '../constants';
 
 Promise.all([
   connect(onGameOver),
@@ -10,15 +11,22 @@ Promise.all([
 ]).then(() => {});
 
 function onGameOver() {
+  changeGameState(GAME_STATES.DEAD);
   stopCapturingInput();
   stopRendering();
   console.log('game over');
 }
 
-/* eslint-disable import/prefer-default-export */
 export function startPlaying(username) {
+  changeGameState(GAME_STATES.PLAYING);
   joinGame(username);
-  changeShouldPlay(true);
+  startCapturingInput();
+  startRendering();
+}
+
+export function restartPlaying(username) {
+  changeGameState(GAME_STATES.PLAYING);
+  joinGame(username);
   startCapturingInput();
   startRendering();
 }

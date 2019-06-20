@@ -23,6 +23,7 @@
         padding: 5px 20px;
         border-radius: 3px;
         transition: background-color 0.2s ease;
+        cursor: pointer;
       }
 
       button:hover {
@@ -37,11 +38,14 @@
   <body>
     <canvas id="game-canvas"></canvas>
     <div id="app">
-      <template v-if="shouldPlay">
-        <leaderboard :leaderboard="leaderboard" />
+      <template v-if="gameState === 'connect'">
+        <intro />
+      </template>
+      <template v-else-if="gameState === 'dead'">
+        <gameover />
       </template>
       <template v-else>
-        <intro />
+        <leaderboard :leaderboard="leaderboard" />
       </template>
     </div>
   </body>
