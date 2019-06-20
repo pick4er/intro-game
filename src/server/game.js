@@ -86,6 +86,13 @@ function getDistanceBetween(object1, object2) {
   return Math.sqrt((dx ** 2) + (dy ** 2));
 }
 
+function getLeaderboard(players) {
+  return Object.values(players)
+    .sort((p1, p2) => p2.score - p1.score)
+    .slice(0, 5)
+    .map(({ username, score }) => ({ username, score }));
+}
+
 class Game {
   constructor() {
     this.sockets = {};
@@ -187,6 +194,7 @@ class Game {
       me: this.players[playerId],
       timestamp: Date.now(),
       bullets: this.bullets,
+      leaderboard: getLeaderboard(this.players),
     };
   }
 }
