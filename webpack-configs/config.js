@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 
 module.exports = function configWebpack(props) {
@@ -14,6 +15,13 @@ module.exports = function configWebpack(props) {
     output: {
       filename: '[name].[contenthash].js',
       path: path.resolve(__dirname, '..', 'dist'),
+    },
+    resolve: {
+      alias: {
+        vue$: production ?
+          'vue/dist/vue.min.js' :
+          'vue/dist/vue.js',
+      },
     },
     module: {
       rules: [
@@ -35,5 +43,8 @@ module.exports = function configWebpack(props) {
         template: 'src/client/index.html',
       }),
     ],
+    optimization: production ?
+      { minimizer: [new UglifyJsPlugin()] } :
+      {},
   };
 };
