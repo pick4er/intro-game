@@ -23,6 +23,10 @@ export function connect(onGameOver) {
   });
 }
 
+export function joinGame(username) {
+  socket.emit(MSG_TYPES.JOIN, username);
+}
+
 export const updateDirection = throttle(direction => {
   socket.emit(MSG_TYPES.MOVE, direction);
 }, 50);

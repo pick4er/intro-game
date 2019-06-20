@@ -14,17 +14,35 @@
         overscroll-behavior: none;
         background-color: black;
       }
-      #app {
-        position: fixed;
-        top: 10px;
-        right: 10px;
+      button {
+        font-size: 18px;
+        outline: none;
+        border: none;
+        color: black;
+        background-color: transparent;
+        padding: 5px 20px;
+        border-radius: 3px;
+        transition: background-color 0.2s ease;
+      }
+
+      button:hover {
+        background-color: rgb(230, 230, 230);
+      }
+
+      button:focus {
+        outline: none;
       }
     </style>
   </head>
   <body>
     <canvas id="game-canvas"></canvas>
     <div id="app">
-      <leaderboard :leaderboard="leaderboard"></leaderboard>
+      <template v-if="shouldPlay">
+        <leaderboard :leaderboard="leaderboard" />
+      </template>
+      <template v-else>
+        <intro />
+      </template>
     </div>
   </body>
 </html>

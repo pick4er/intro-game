@@ -27,15 +27,20 @@ const io = socketio(server);
 io.on(MSG_TYPES.CONNECT, onPlayerConnection);
 
 function onPlayerConnection(socket) {
-  setTimeout(() => onJoin(socket), 300);
+  addSocket(socket);
   socket.on(MSG_TYPES.DISCONNECT, onLeave);
   socket.on(MSG_TYPES.MOVE, onMove);
+  socket.on(MSG_TYPES.JOIN, onJoin);
 }
 
 const game = new Game();
 
-function onJoin(socket) {
-  game.addPlayer(socket);
+function addSocket(socket) {
+  game.addSocket(socket);
+}
+
+function onJoin(username) {
+  game.addPlayer(this, username);
 }
 
 function onLeave() {

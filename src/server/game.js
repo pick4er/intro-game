@@ -103,7 +103,9 @@ class Game {
     setInterval(this.update.bind(this), SERVER_UPDATE_INTERVAL);
   }
 
-  addPlayer(socket) {
+  addSocket(socket) {}
+
+  addPlayer(socket, username) {
     this.sockets[socket.id] = socket;
 
     const x = MAP_SIZE * Math.random();
@@ -113,6 +115,7 @@ class Game {
     this.players[socket.id] = {
       x,
       y,
+      username,
       direction,
       score: 0,
       id: socket.id,

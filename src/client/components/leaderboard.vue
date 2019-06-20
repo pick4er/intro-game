@@ -20,6 +20,9 @@
 
 <style module>
   .table {
+    position: fixed;
+    top: 10px;
+    right: 10px;
     background-color: rgba(255, 255, 255, 0.5);
     padding: 10px;
     border-radius: 5px;
