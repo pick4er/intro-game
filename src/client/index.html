@@ -14,9 +14,37 @@
         overscroll-behavior: none;
         background-color: black;
       }
+      #leaderboard {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      #leaderboard th {
+        text-align: center;
+        padding: 2px 5px;
+      }
+
+      #leaderboard td {
+        text-align: center;
+        padding: 2px 5px;
+      }
     </style>
   </head>
   <body>
     <canvas id="game-canvas"></canvas>
+    <table id="leaderboard">
+      <tr>
+        <th>Username</th>
+        <th>Score</th>
+      </tr>
+      <tr v-for="player in leaderboard">
+        <td>{{ player.username }}</td>
+        <td>{{ player.score }}</td>
+      </tr>
+    </table>
   </body>
 </html>
