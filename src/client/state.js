@@ -1,10 +1,12 @@
 import { RENDER_DELAY } from '../constants';
+import { updateLeaderboard } from './leaderboard';
 
 const updates = [];
 
 export function processGameUpdate(update) {
   updates.push(update);
   const updateIndex = getUpdateIndex();
+  updateLeaderboard(update.leaderboard);
   if (updateIndex > 0) {
     updates.splice(0, updateIndex);
   }
